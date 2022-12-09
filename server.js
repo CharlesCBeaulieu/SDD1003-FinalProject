@@ -9,7 +9,7 @@ var uri = 'mongodb+srv://charlesbeaulieu:DE1h6fOiPa764hmJ@cluster0.ptmtvxt.mongo
 const client = new MongoClient(uri);
 
 //listen port
-app.listen(process.env.PORT || 5000)
+app.listen(process.env.PORT || 6969)
 
 //set expressJS view engine
 app.set('view engine', 'ejs')
@@ -37,14 +37,13 @@ app.get('/read', (req, res) => {
   res.render('index')
 })
 
-//POST method route
+//Read method
 app.post('/', async (req, res) => {
   let form = new multiparty.Form();
   form.parse(req, async function (err, fields, files) {
     res.send(JSON.stringify(await run(fields.bedroom[0], fields.minNight[0], fields.maxNight[0])))
   })
 })
-
 //function to query Bedrooms, minrooms, maxrooms
 async function run(bedroom, minNight, maxNight) {
   try {
@@ -58,5 +57,30 @@ async function run(bedroom, minNight, maxNight) {
   } catch (e) {
     await client.close();
   }
-
 }
+
+
+
+//delete method
+app.post('/delete', async (req, res) => {
+  let form = new multiparty.Form();
+  form.parse(req, async function (err, fields, files) {
+    res.send(JSON.stringify(await delete_doc(fields.query[0])))
+  })
+})
+//delete fonction with query
+async function delete_doc(query) {
+  try {
+    //access database collection
+    const database = client.db('sample_airbnb');
+    const listingsAndReviews = database.collection('listingsAndReviews');
+
+    //return query result
+    let result = listingsAndReviews.find(query).limit(5).toArray();
+    //listingsAndReviews.removeMany(query);
+    return result;
+  } catch (e) {
+    await client.close();
+  }
+}
+
