@@ -1,0 +1,47 @@
+<!-- Include header -->
+<%- include('include/_header') %>
+<!-- Include header -->
+
+<!-- Include deleteform -->
+<%- include('include/_deleteform') %>
+<!-- Include deleteform -->
+
+<script>
+    async function fetchData(e) {
+        e.preventDefault();
+
+        //Getting the data by id from the input
+        let data = new FormData();
+        data.append("bedroom", document.getElementById("bedroom").value);
+        data.append("maxNight", document.getElementById("maxNight").value);
+        data.append("minNight", document.getElementById("minNight").value);
+
+        //send data via POST to the server
+        let ajaxCall = new XMLHttpRequest();
+        ajaxCall.open("POST", "/", true);
+        ajaxCall.send(data);
+
+        //get the response from the server
+        ajaxCall.onload = function () {
+            let data = JSON.parse(this.responseText);
+            //log data for debug
+            console.log(data);
+
+            //create a table made of the content that the server send (query result)
+            let wrapper = document.createElement("table");
+            wrapper.classList.add("table-dark")
+            wrapper.classList.add("table")
+
+            data.forEach(element => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `<td> ID : ${element['_id']} <br>Name :  ${element['name']} <br>Listing URL : ${element['listing_url']} <br>Bedrooms : ${element['bedrooms']}<br>Minimum Nights : ${element['minimum_nights']}<br>MaximumNights : ${element['maximum_nights']} </td>`;
+                tr.setAttribute('scope', 'row')
+                wrapper.appendChild(tr);
+            });
+
+            //display result
+            document.getElementById("main").appendChild(wrapper);
+        }
+
+    }
+</script>

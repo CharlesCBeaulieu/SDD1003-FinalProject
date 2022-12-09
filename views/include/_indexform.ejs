@@ -1,0 +1,21 @@
+<div id="main" class="container mt-3">
+    <!--Form that send data via POST method-->
+    <!--That Form content a label, a search bar and a search button (find)-->
+    <div class="form-group">
+        <label for="bedroom">Bedroom</label>
+        <input type="number" class="form-control" id="bedroom" placeholder="bedroom">
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="minNight">Minimum Night</label>
+            <input type="number" class="form-control" id="minNight" placeholder="Minimum">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="maxNight">Maximum Night</label>
+            <input type="number" class="form-control" id="maxNight" placeholder="Maximum">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg btn-block" id="getdata" onclick="fetchData(event)">Find
+    </button>
+    <br>
+</div>

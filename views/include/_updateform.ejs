@@ -1,0 +1,21 @@
+<div id="updateform" class="container mt-3">
+    <!--Form that send data via POST method-->
+    <!--That Form content a label, a search bar and a search button (find)-->
+    <div class="form-group">
+        <label for="query">Query</label>
+        <input type="text" class="form-control" id="query" placeholder="Query">
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="field_to_update">Field To Update</label>
+            <input type="text" class="form-control" id="field_to_update" placeholder="Field to update">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="new_value">New Value</label>
+            <input type="text" class="form-control" id="new_value" placeholder="New value">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg btn-block" id="getdata" onclick="fetchData(event)">Update
+    </button>
+    <br>
+</div>
