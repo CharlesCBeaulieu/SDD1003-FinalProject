@@ -12,13 +12,11 @@
 
         //Getting the data by id from the input
         let data = new FormData();
-        data.append("bedroom", document.getElementById("bedroom").value);
-        data.append("maxNight", document.getElementById("maxNight").value);
-        data.append("minNight", document.getElementById("minNight").value);
+        data.append("id", document.getElementById("id").value);
 
         //send data via POST to the server
         let ajaxCall = new XMLHttpRequest();
-        ajaxCall.open("POST", "/", true);
+        ajaxCall.open("POST", "/delete", true);
         ajaxCall.send(data);
 
         //get the response from the server
@@ -40,8 +38,12 @@
             });
 
             //display result
-            document.getElementById("main").appendChild(wrapper);
+            document.getElementById("deleteform").appendChild(wrapper);
         }
 
     }
 </script>
+
+<!-- Include footer -->
+<%- include('include/_footer') %>
+<!-- Include footer -->
