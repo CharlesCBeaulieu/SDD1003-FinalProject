@@ -93,7 +93,7 @@ async function delete_doc(id) {
 app.post('/update', async (req, res) => {
   let form = new multiparty.Form();
   form.parse(req, async function (err, fields, files) {
-    res.send(JSON.stringify(await update_doc(fields.id[0], fields.field_to_update[0], fields.new_value[0])))
+    res.send(JSON.stringify(await update_doc(fields.id[0], fields.field_to_update[0].toString(), fields.new_value[0])))
   })
 })
 //delete fonction with query
@@ -107,9 +107,12 @@ async function update_doc(id, field_to_update, new_value) {
     console.log(id)
     console.log(field_to_update)
     console.log(new_value)
+
     let filter = {_id : id }
-    let update = {field_to_update : new_value}
-    let query = {filter, update}
+    let update = {}
+    update[field_to_update] = new_value
+    let x = {$set : update}
+    let query = Object.assign({filter},x)
     console.log(query)
 
     let result = listingsAndReviews.find(filter).toArray();

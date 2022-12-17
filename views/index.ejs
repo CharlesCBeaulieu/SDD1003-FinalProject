@@ -33,8 +33,6 @@
                     wrapper.classList.add("table-dark")
                     wrapper.classList.add("table")
                     
-                     
-
                     data.forEach(element => {
                         let tr = document.createElement('tr');
                         tr.innerHTML = `<td> ID : ${element['_id']} <br>Name :  ${element['name']} <br>Listing URL : ${element['listing_url']} <br>Bedrooms : ${element['bedrooms']}<br>Minimum Nights : ${element['minimum_nights']}<br>MaximumNights : ${element['maximum_nights']} </td>`;
