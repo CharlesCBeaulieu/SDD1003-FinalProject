@@ -108,19 +108,29 @@ async function update_doc(id, field_to_update, new_value) {
     console.log(field_to_update)
     console.log(new_value)
 
-    let filter = {_id : id }
-    let update = {}
-    update[field_to_update] = new_value
-    let x = {$set : update}
-    let query = Object.assign({filter},x)
-    console.log(query)
+    //initilized filed of the update query
+    let filter = {_id : id};
+    let update = {};
+    update[field_to_update] = new_value;
 
-    let result = listingsAndReviews.find(filter).toArray();
-    listingsAndReviews.updateOne(query);
-    result.push(listingsAndReviews.find(filter).toArray());
-    
+    let result = await listingsAndReviews.find(filter).toArray()
+
+    //update one request
+    let test = await listingsAndReviews.updateOne(filter, {
+      $set: {
+        //unbuild the object
+        ...update
+      }
+    });
+    //console.log(test)
+
+    //return the result after mofification
+    result.push((await listingsAndReviews.find(filter).toArray())[0]);
+    console.log(result)
     return result;
+
   } catch (e) {
+    console.log(e)
     await client.close();
   }
 }
