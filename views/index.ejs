@@ -1,53 +1,55 @@
 <!-- Include header -->
 <%- include('include/_header') %>
 <!-- Include header -->
+<div id="container" class="d-flex justify-content-center mh-50">
+    <canvas id="Chart" class="p-5 mx-auto my-auto"></canvas>
+</div>
 
-<!-- Include indexform -->
-<%- include('include/_indexform') %>
-<!-- Include indexform -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    ids = [];
+    frequency = [];
 
-        <!-- script to get the data, send it to the server that will perform a mongodb query on the database-->
-        <script>
-            async function fetchData(e) {
-                e.preventDefault();
+    // populate ids and frequency
+    <% for(var i = 0; i < docs.length; i++) { %>
+    <% if (docs[i]._id == null) { %>
+    ids.push('null')
+    <%} else { %>
+    ids.push(<%= docs[i]._id %>)
+    <% } %>
+    frequency.push(<%= docs[i].count %>)
+    <% } %>
 
-                //Getting the data by id from the input
-                let data = new FormData();
-                data.append("bedroom", document.getElementById("bedroom").value);
-                data.append("maxNight", document.getElementById("maxNight").value);
-                data.append("minNight", document.getElementById("minNight").value);
+    // console log the data for visualisation
+    console.log(ids)
+    console.log(frequency)
+</script>
 
-                //send data via POST to the server
-                let ajaxCall = new XMLHttpRequest();
-                ajaxCall.open("POST", "/", true);
-                ajaxCall.send(data);
+<script>
+    //Bar chart
+    const ctx = document.getElementById('Chart');
 
-                //get the response from the server
-                ajaxCall.onload = function () {
-                    let data = JSON.parse(this.responseText);
-                    //log data for debug
-                    console.log(data);
-
-                    //create a table made of the content that the server send (query result)
-                    let wrapper = document.createElement("table");
-                    wrapper.classList.add("table-dark")
-                    wrapper.classList.add("table")
-                    
-                    data.forEach(element => {
-                        let tr = document.createElement('tr');
-                        tr.innerHTML = `<td> ID : ${element['_id']} <br>Name :  ${element['name']} <br>Listing URL : ${element['listing_url']} <br>Bedrooms : ${element['bedrooms']}<br>Minimum Nights : ${element['minimum_nights']}<br>MaximumNights : ${element['maximum_nights']} </td>`;
-                        tr.setAttribute('scope', 'row')
-                        wrapper.appendChild(tr);
-                    });
-
-                    //display result
-                    document.getElementById("main").appendChild(wrapper);
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            // ids as X data
+            labels: ids, //ids
+            datasets: [{
+                label: 'Count of this number of beds',
+                // frequency as Y data
+                data: frequency,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
-
             }
-        </script>
-        </body>
-
+        }
+    });
+</script>
 <!-- Include footer -->
 <%- include('include/_footer') %>
 <!-- Include footer -->

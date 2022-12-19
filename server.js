@@ -4,8 +4,8 @@ const app = express();
 const multiparty = require('multiparty');
 
 //mongoDB
-const { MongoClient } = require('mongodb');
-var uri = 'mongodb+srv://charlesbeaulieu:DE1h6fOiPa764hmJ@cluster0.ptmtvxt.mongodb.net/?retryWrites=true&w=majority'
+const {MongoClient} = require('mongodb');
+const uri = 'mongodb+srv://charlesbeaulieu:IwFnZfmVQFow3cPW@cluster0.ptmtvxt.mongodb.net/?retryWrites=true&w=majority'
 const client = new MongoClient(uri);
 
 //listen port
@@ -17,120 +17,173 @@ console.log("Listening to port " + port);
 app.set('view engine', 'ejs')
 
 //Routes
-
 //GET method route
 app.get('/', (req, res) => {
-  res.render('index')
+    //get the data via the chart function and send it to the client via the docs variable
+    chart().then(data => {
+        res.render('index', {docs: data});
+    })
+})
+
+async function chart() {
+    //get the data to generate the home graph
+    try {
+        // client connect to database
+        await client.connect();
+        // select database
+        const database = await client.db('sample_airbnb');
+        //select collection
+        const listingsAndReviews = await database.collection('listingsAndReviews');
+
+        // aggregation that return a cursor with the frequency of the number of beds
+        const data = await listingsAndReviews.aggregate([
+            {
+                "$group": {
+                    "_id": "$beds",
+                    "count": {"$sum": 1}
+                }
+            },
+            {"$sort": {count: -1}}
+        ]).toArray()
+        console.log(data);
+        return data
+    } finally {
+        await client.close();
+    }
+}
+
+app.get('/read', (req, res) => {
+    res.render('read')
 })
 
 app.get('/create', (req, res) => {
-  res.render('create')
+    res.render('create')
 })
 
 app.get('/delete', (req, res) => {
-  res.render('delete')
+    res.render('delete')
 })
 
 app.get('/update', (req, res) => {
-  res.render('update')
+    res.render('update')
 })
 
 app.get('/read', (req, res) => {
-  res.render('index')
+    res.render('index')
 })
 
-//Read method
+// -------------------------------------------------------------------------------------------------------
+// read method
 app.post('/', async (req, res) => {
-  let form = new multiparty.Form();
-  form.parse(req, async function (err, fields, files) {
-    res.send(JSON.stringify(await run(fields.bedroom[0], fields.minNight[0], fields.maxNight[0])))
-  })
+    // receive form inputs
+    let form = new multiparty.Form();
+    // send the result to client
+    form.parse(req, async function (err, fields, files) {
+        res.send(JSON.stringify(await read(fields.bedroom[0], fields.minNight[0], fields.maxNight[0])))
+    })
 })
-//function to query Bedrooms, minrooms, maxrooms
-async function run(bedroom, minNight, maxNight) {
-  try {
-    //access database collection
-    const database = client.db('sample_airbnb');
-    const listingsAndReviews = database.collection('listingsAndReviews');
-    //build query
-    const query = { bedrooms: parseInt(bedroom), minimum_nights: minNight, maximum_nights: maxNight };
-    //return query result
-    return listingsAndReviews.find(query).limit(5).toArray();
-  } catch (e) {
-    await client.close();
-  }
+
+// function to query Bedrooms, minrooms, maxrooms
+async function read(bedroom, minNight, maxNight) {
+    try {
+        await client.connect();
+        // select database
+        const database = await client.db('sample_airbnb');
+        //select collection
+        const listingsAndReviews = await database.collection('listingsAndReviews');
+        //build query
+        const query = {bedrooms: parseInt(bedroom), minimum_nights: minNight, maximum_nights: maxNight};
+        //return query result
+        return await listingsAndReviews.find(query).limit(5).toArray();
+    } catch (e) {
+        console.log(e)
+        console.log("read error")
+        await client.close();
+    }
 }
 
-
-
+// -------------------------------------------------------------------------------------------------------
 //delete method
 app.post('/delete', async (req, res) => {
-  let form = new multiparty.Form();
-  form.parse(req, async function (err, fields, files) {
-    res.send(JSON.stringify(await delete_doc(fields.id[0])))
-  })
+    // receive form inputs
+    let form = new multiparty.Form();
+    // send the result to client
+    form.parse(req, async function (err, fields, files) {
+        res.send(JSON.stringify(await delete_doc(fields.id[0])))
+    })
 })
-//delete fonction with query
+
+//delete function with query
 async function delete_doc(id) {
-  try {
-    //access database collection
-    const database = client.db('sample_airbnb');
-    const listingsAndReviews = database.collection('listingsAndReviews');
-
-    //return query result
-    console.log(id)
-    let query = {_id : id }
-    console.log(query)
-    let result = listingsAndReviews.find(query).limit(5).toArray();
-    listingsAndReviews.deleteOne(query);
-    return result;
-  } catch (e) {
-    await client.close();
-  }
+    try {
+        await client.connect();
+        // select database
+        const database = await client.db('sample_airbnb');
+        //select collection
+        const listingsAndReviews = await database.collection('listingsAndReviews');
+        //build query
+        let query = {_id: id}
+        // find the element we delete to send it to the client for visualisation
+        let result = listingsAndReviews.find(query).toArray();
+        // delete the document with the matching id
+        await listingsAndReviews.deleteOne(query);
+        console.log(id + " have been deleted")
+        return result;
+    } catch (e) {
+        console.log(e)
+        console.log("error with delete")
+        await client.close();
+    }
 }
 
-//update method
+// -------------------------------------------------------------------------------------------------------
+// update method
 app.post('/update', async (req, res) => {
-  let form = new multiparty.Form();
-  form.parse(req, async function (err, fields, files) {
-    res.send(JSON.stringify(await update_doc(fields.id[0], fields.field_to_update[0].toString(), fields.new_value[0])))
-  })
+    // receive form inputs
+    let form = new multiparty.Form();
+    // send the result to client
+    form.parse(req, async function (err, fields, files) {
+        res.send(JSON.stringify(await update_doc(fields.id[0], fields.field_to_update[0].toString(), fields.new_value[0])))
+    })
 })
-//delete fonction with query
+
+// update function with query
 async function update_doc(id, field_to_update, new_value) {
-  try {
-    //access database collection
-    const database = client.db('sample_airbnb');
-    const listingsAndReviews = database.collection('listingsAndReviews');
+    try {
+        //access database collection
+        await client.connect();
+        // select database
+        const database = await client.db('sample_airbnb');
+        //select collection
+        const listingsAndReviews = await database.collection('listingsAndReviews');
 
-    //return query result
-    console.log(id)
-    console.log(field_to_update)
-    console.log(new_value)
+        //initialized filed of the update query
+        let filter = {_id: id};
+        let update = {};
+        update[field_to_update] = new_value;
 
-    //initilized filed of the update query
-    let filter = {_id : id};
-    let update = {};
-    update[field_to_update] = new_value;
+        // find the item to update for visualisation
+        let result = await listingsAndReviews.find(filter).toArray()
 
-    let result = await listingsAndReviews.find(filter).toArray()
+        //update one request
+        await listingsAndReviews.updateOne(filter, {
+            $set: {
+                //unbuild the object
+                ...update
+            }
+        });
+        //console.log(test)
 
-    //update one request
-    let test = await listingsAndReviews.updateOne(filter, {
-      $set: {
-        //unbuild the object
-        ...update
-      }
-    });
-    //console.log(test)
+        // push to result after modification and return
+        result.push((await listingsAndReviews.find(filter).toArray())[0]);
+        return result;
 
-    //return the result after mofification
-    result.push((await listingsAndReviews.find(filter).toArray())[0]);
-    console.log(result)
-    return result;
-
-  } catch (e) {
-    console.log(e)
-    await client.close();
-  }
+    } catch (e) {
+        console.log(e)
+        console.log("error update")
+        await client.close();
+    }
 }
+
+// -------------------------------------------------------------------------------------------------------
+
