@@ -25,6 +25,7 @@ app.get('/', (req, res) => {
     })
 })
 
+// chart request
 async function chart() {
     //get the data to generate the home graph
     try {
@@ -56,10 +57,6 @@ app.get('/read', (req, res) => {
     res.render('read')
 })
 
-app.get('/create', (req, res) => {
-    res.render('create')
-})
-
 app.get('/delete', (req, res) => {
     res.render('delete')
 })
@@ -79,12 +76,12 @@ app.post('/', async (req, res) => {
     let form = new multiparty.Form();
     // send the result to client
     form.parse(req, async function (err, fields, files) {
-        res.send(JSON.stringify(await read(fields.bedroom[0], fields.minNight[0], fields.maxNight[0])))
+        res.send(JSON.stringify(await read_doc(fields.bedroom[0], fields.minNight[0], fields.maxNight[0])))
     })
 })
 
-// function to query Bedrooms, minrooms, maxrooms
-async function read(bedroom, minNight, maxNight) {
+// this function query data to mongodb
+async function read_doc(bedroom, minNight, maxNight) {
     try {
         await client.connect();
         // select database
@@ -113,7 +110,7 @@ app.post('/delete', async (req, res) => {
     })
 })
 
-//delete function with query
+// this function query data to mongodb and delete a document
 async function delete_doc(id) {
     try {
         await client.connect();
@@ -147,7 +144,7 @@ app.post('/update', async (req, res) => {
     })
 })
 
-// update function with query
+// this function query data to mongodb and update a document
 async function update_doc(id, field_to_update, new_value) {
     try {
         //access database collection
@@ -184,6 +181,4 @@ async function update_doc(id, field_to_update, new_value) {
         await client.close();
     }
 }
-
-// -------------------------------------------------------------------------------------------------------
 

@@ -2,9 +2,9 @@
 <%- include('include/_header') %>
 <!-- Include header -->
 
-<!-- Include deleteform -->
+<!-- Include delete form -->
 <%- include('include/_deleteform') %>
-<!-- Include deleteform -->
+<!-- Include delete form -->
 
 <script>
     async function fetchData(e) {
@@ -36,11 +36,9 @@
                 tr.setAttribute('scope', 'row')
                 wrapper.appendChild(tr);
             });
-
             //display result
             document.getElementById("deleteform").appendChild(wrapper);
         }
-
     }
 </script>
 

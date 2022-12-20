@@ -2,51 +2,49 @@
 <%- include('include/_header') %>
 <!-- Include header -->
 
-<!-- Include indexform -->
+<!-- Include read form -->
 <%- include('include/_readform') %>
-<!-- Include indexform -->
+<!-- Include read form -->
 
-        <!-- script to get the data, send it to the server that will perform a mongodb query on the database-->
-        <script>
-            async function fetchData(e) {
-                e.preventDefault();
+<!-- script to get the client input data,
+send it to the server that will perform a
+mongodb query on the database-->
+<script>
+    async function fetchData(e) {
+        e.preventDefault();
 
-                //Getting the data by id from the input
-                let data = new FormData();
-                data.append("bedroom", document.getElementById("bedroom").value);
-                data.append("maxNight", document.getElementById("maxNight").value);
-                data.append("minNight", document.getElementById("minNight").value);
+        //Getting the data by id from the input
+        let data = new FormData();
+        data.append("bedroom", document.getElementById("bedroom").value);
+        data.append("maxNight", document.getElementById("maxNight").value);
+        data.append("minNight", document.getElementById("minNight").value);
 
-                //send data via POST to the server
-                let ajaxCall = new XMLHttpRequest();
-                ajaxCall.open("POST", "/", true);
-                ajaxCall.send(data);
+        //send data via POST to the server
+        let ajaxCall = new XMLHttpRequest();
+        ajaxCall.open("POST", "/", true);
+        ajaxCall.send(data);
 
-                //get the response from the server
-                ajaxCall.onload = function () {
-                    let data = JSON.parse(this.responseText);
-                    //log data for debug
-                    console.log(data);
+        // receive response from the server
+        ajaxCall.onload = function () {
+            let data = JSON.parse(this.responseText);
 
-                    //create a table made of the content that the server send (query result)
-                    let wrapper = document.createElement("table");
-                    wrapper.classList.add("table-dark")
-                    wrapper.classList.add("table")
-                    
-                    data.forEach(element => {
-                        let tr = document.createElement('tr');
-                        tr.innerHTML = `<td> ID : ${element['_id']} <br>Name :  ${element['name']} <br>Listing URL : ${element['listing_url']} <br>Bedrooms : ${element['bedrooms']}<br>Minimum Nights : ${element['minimum_nights']}<br>MaximumNights : ${element['maximum_nights']} </td>`;
-                        tr.setAttribute('scope', 'row')
-                        wrapper.appendChild(tr);
-                    });
+            // create a table made of the content that the server send (query result)
+            let wrapper = document.createElement("table");
+            wrapper.classList.add("table-dark")
+            wrapper.classList.add("table")
 
-                    //display result
-                    document.getElementById("main").appendChild(wrapper);
-                }
+            data.forEach(element => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `<td> ID : ${element['_id']} <br>Name :  ${element['name']} <br>Listing URL : ${element['listing_url']} <br>Bedrooms : ${element['bedrooms']}<br>Minimum Nights : ${element['minimum_nights']}<br>MaximumNights : ${element['maximum_nights']} </td>`;
+                tr.setAttribute('scope', 'row')
+                wrapper.appendChild(tr);
+            });
 
-            }
-        </script>
-        </body>
+            //display result
+            document.getElementById("main").appendChild(wrapper);
+        }
+    }
+</script>
 
 <!-- Include footer -->
 <%- include('include/_footer') %>

@@ -2,10 +2,13 @@
 <%- include('include/_header') %>
 <!-- Include header -->
 
-<!-- Include header -->
+<!-- Include update form -->
 <%- include('include/_updateform') %>
-<!-- Include header -->
+<!-- Include update form -->
 
+<!-- script to get the client input data,
+send it to the server that will perform a
+mongodb query on the database-->
 <script>
     async function fetchData(e) {
         e.preventDefault();

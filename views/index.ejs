@@ -1,12 +1,18 @@
 <!-- Include header -->
 <%- include('include/_header') %>
 <!-- Include header -->
+
+<!-- Chart container -->
 <div id="container" class="d-flex justify-content-center mh-50">
     <canvas id="Chart" class="p-5 mx-auto my-auto"></canvas>
 </div>
 
+<!-- Chart lib -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Data for chart -->
 <script>
+    //initialised ids and frequency, our data vector for the chart
     ids = [];
     frequency = [];
 
@@ -14,7 +20,7 @@
     <% for(var i = 0; i < docs.length; i++) { %>
     <% if (docs[i]._id == null) { %>
     ids.push('null')
-    <%} else { %>
+    <% } else { %>
     ids.push(<%= docs[i]._id %>)
     <% } %>
     frequency.push(<%= docs[i].count %>)
@@ -25,15 +31,16 @@
     console.log(frequency)
 </script>
 
+<!-- Chart -->
 <script>
-    //Bar chart
+    // bar chart
     const ctx = document.getElementById('Chart');
 
     new Chart(ctx, {
         type: 'doughnut',
         data: {
             // ids as X data
-            labels: ids, //ids
+            labels: ids, // ids
             datasets: [{
                 label: 'Count of this number of beds',
                 // frequency as Y data
@@ -50,6 +57,7 @@
         }
     });
 </script>
+
 <!-- Include footer -->
 <%- include('include/_footer') %>
 <!-- Include footer -->
